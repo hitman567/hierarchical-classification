@@ -61,7 +61,7 @@ h2_groundtruths = to_categorical(h2_list, len(h2_folders))
 input_images = np.array(image_list)
 input_images = input_images/255
 
-model = load_model('./weights/'+'hierarchical_model2.h5')
+model = load_model('./weights/'+'hierarchical_model1.h5')
 
 print(model.metrics_names)
 score = model.evaluate(input_images,[h1_groundtruths, h2_groundtruths], verbose=0)

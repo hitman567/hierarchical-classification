@@ -29,7 +29,7 @@ beta = K.variable(value=0.3, dtype="float32", name="beta")
 log_num=len(os.listdir("./Logs"))
 log_filepath = "./Logs/tb_log_"+str(log_num+1)+"/"
 weights_store_filepath = './weights/'
-train_id = '2'
+train_id = '1'
 model_name = 'hierarchical_model'+train_id+'.h5'
 model_path = os.path.join(weights_store_filepath, model_name)
 
@@ -115,9 +115,9 @@ class LossWeightsModifier(keras.callbacks.Callback):
 #    if epoch == 18:
 #      K.set_value(self.alpha, 0.2)
 #      K.set_value(self.beta, 0.8)
-#    if epoch == 42:
-#      K.set_value(self.alpha, 0.0)
-#      K.set_value(self.beta, 1.0)
+    if epoch == 42:
+      K.set_value(self.alpha, 0.0)
+      K.set_value(self.beta, 1.0)
 
 def BCNN_model(input_shape, num_h1, num_h2):
 
