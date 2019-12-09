@@ -1,6 +1,4 @@
 import os
-import collections
-import operator
 import pandas as pd
 import numpy as np
 import glob
@@ -58,92 +56,63 @@ for i in range(len(images)):
   h2_list.append(h2_class)
 
 h1_groundtruths = to_categorical(h1_list, len(h1_folders))
-h2_groundtruths = to_categorical(h2_list, len(h2_folders))
+#h2_groundtruths = to_categorical(h2_list, len(h2_folders))
 
 input_images = np.array(image_list)
 input_images = input_images/255
 
-model = load_model('./weights/'+'hierarchical_model2.h5')
+model = load_model('./weights_h1_classifier/'+'h1_model1.h5')
 
-score = model.evaluate(input_images,[h1_groundtruths, h2_groundtruths], verbose=0)
+score = model.evaluate(input_images,[h1_groundtruths], verbose=0)
 
-for i in range(0,5):
-	print(model.metrics_names[i],':',score[i])
-#print(model.metrics_names[4])
-#print(score[4])
+for i in range(0,2):
+        print(model.metrics_names[i],':',score[i])
+
 
 pred = model.predict(input_images)
 
-#model.summary()
+#print(len(pred))
 
-l1 = pred[0]
-l2 = pred[1]
+result=[]
 
-result = []
-
-
-#print(h1_mapping)
-#print(h2_mapping)
-
-for i in range(len(l1)):
+for i in range(len(pred)):
 	y=[]
 	y.append(images[i])
-	y1=[]
 	y.append(images[i].split('/')[1])
-	y.append(images[i].split('/')[2])
 	for key,value in h1_mapping.items():
-		if value == np.argmax(l1[i]):
-			y.append(key)
-	for key,value in h2_mapping.items():
-		if value == np.argmax(l2[i]):
+		if value == np.argmax(pred[i]):
 			y.append(key)
 	result.append(y)
 
 data = pd.DataFrame(result)
-data.columns = ['image_name','h1_groundtruths','h2_groundtruths','h1_prediction','h2_prediction']
+data.columns = ['image_name','h1_groundtruths','h1_prediction']
 
-data.to_csv('results.csv',sep='\t', encoding='utf-8')
+#data.to_csv('h1_layer.csv',sep='\t', encoding='utf-8')
 
 h1=[]
 h2=[]
+
 for i in range(1300):
-	h1.append(h1_mapping[data['h1_prediction'][i]])
-	h2.append(h2_mapping[data['h2_prediction'][i]])
+        h1.append(h1_mapping[data['h1_prediction'][i]])
+#        h2.append(h2_mapping[data['h2_prediction'][i]])
+list=[]
+for key,value in h1_mapping.items():
 
-h1_pred = to_categorical(h1,3)
-h2_pred = to_categorical(h2,13)
-#print(h2_mapping)
-#print(h1_pred)
-#print(data['h2_prediction'][0])
-
-list_h1 = []
-for key, value in h1_mapping.items():
-	list_h1.append(key)
-sorted_x = sorted(h2_mapping.items(), key=operator.itemgetter(1))
-h2_mapping = collections.OrderedDict(sorted_x)
-list_h2 = []
-for key, value in h2_mapping.items():
-	list_h2.append(key)
-
+	list.append(key)
+#print(list)
 confusion_matrix_h1 = confusion_matrix(h1_list,h1)
 print('Confusion Matrix for h1 layer:')
-print(pd.DataFrame(confusion_matrix_h1, index=list_h1, columns=list_h1))
+print(pd.DataFrame(confusion_matrix_h1, index=list, columns=list))
 
-list_h1 = [str(i) for i in list_h1]
+#classification_report_h1=classification_report(h1_list,h1)
+#print(list)
+#print(str(list))
+list = [str(i) for i in list]
+print(list)
 print('Classification Report for h1 layer:')
-print(classification_report(h1_list,h1,target_names=list_h1))
+print(classification_report(h1_list, h1, target_names=list))
 
-confusion_matrix_h2 = confusion_matrix(h2_list,h2)
-print('Confusion Matrix for h2 layer:')
-print(pd.DataFrame(confusion_matrix_h2, index=list_h2, columns=list_h2))
-print('Classification Report for h2 layer:')
-print(classification_report(h2_list,h2,target_names=list_h2))
-
-print(h1_mapping)
-print(h2_mapping)
-#print(l1)
-#print(l2[0])
-#print(len(pred))
-#print(pred[0].shape)
-
-#print(data)
+#print('Confusion Matrix for h2 layer:')
+#print(confusion_matrix(h2_list,h2))
+#print('Classification Report for h2 layer:')
+#print(classification_report(h2_list,h2))
